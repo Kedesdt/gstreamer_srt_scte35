@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ImportGroup Label="PropertySheets">
+    <Import Condition="$(glib_2_0Imported)!=true" Project="glib-2.0.props" />
+    <Import Condition="$(gobject_2_0Imported)!=true" Project="gobject-2.0.props" />
+    <Import Condition="$(CommonImported)!=true" Project="Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <gstreamer_1_0Imported>true</gstreamer_1_0Imported>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GSTREAMER_1_0_ROOT_MSVC_X86_64)\include\gstreamer-1.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\gstreamer\1.0\msvc_x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>gstreamer-1.0.lib;gobject-2.0.lib;glib-2.0.lib;libgstmpegts-1.0.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSYS_PATH)/mingw64/include/gtkmm-3.0;$(MSYS_PATH)/mingw64/lib/gtkmm-3.0/include;$(MSYS_PATH)/mingw64/include/atkmm-1.6;$(MSYS_PATH)/mingw64/lib/atkmm-1.6/include;$(MSYS_PATH)/mingw64/include/gdkmm-3.0;$(MSYS_PATH)/mingw64/lib/gdkmm-3.0/include;$(MSYS_PATH)/mingw64/include/giomm-2.4;$(MSYS_PATH)/mingw64/lib/giomm-2.4/include;$(MSYS_PATH)/mingw64/include/gtk-3.0;$(MSYS_PATH)/mingw64/include/cairo;$(MSYS_PATH)/mingw64/include/atk-1.0;$(MSYS_PATH)/mingw64/include/pangomm-1.4;$(MSYS_PATH)/mingw64/lib/pangomm-1.4/include;$(MSYS_PATH)/mingw64/include/glibmm-2.4;$(MSYS_PATH)/mingw64/lib/glibmm-2.4/include;$(MSYS_PATH)/mingw64/include/cairomm-1.0;$(MSYS_PATH)/mingw64/lib/cairomm-1.0/include;$(MSYS_PATH)/mingw64/include/sigc++-2.0;$(MSYS_PATH)/mingw64/lib/sigc++-2.0/include;$(MSYS_PATH)/mingw64/include/pango-1.0;$(MSYS_PATH)/mingw64/include/freetype2;$(MSYS_PATH)/mingw64/include/harfbuzz;$(MSYS_PATH)/mingw64/include/gdk-pixbuf-2.0;$(MSYS_PATH)/mingw64/include/glib-2.0;$(MSYS_PATH)/mingw64/lib/glib-2.0/include;$(MSYS_PATH)/mingw64/include/pixman-1;$(MSYS_PATH)/mingw64/include/fribidi;$(MSYS_PATH)/mingw64/include/libpng16;$(MSYS_PATH)/mingw64/include/webp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIBDEFLATE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(MSYS_PATH)\mingw64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgtkmm-3.0.dll.a;libatkmm-1.6.dll.a;libgdkmm-3.0.dll.a;libgiomm-2.4.dll.a;libgtk-3.dll.a;libgdk-3.dll.a;libz.dll.a;libgdi32.a;libimm32.a;libshell32.a;libole32.a;libuuid.a;libwinmm.a;libdwmapi.a;libsetupapi.a;libcfgmgr32.a;libhid.a;libwinspool.a;libcomctl32.a;libcomdlg32.a;libpangowin32-1.0.dll.a;libatk-1.0.dll.a;libcairo-gobject.dll.a;libgio-2.0.dll.a;libpangomm-1.4.dll.a;libglibmm-2.4.dll.a;libcairomm-1.0.dll.a;libsigc-2.0.dll.a;libpangocairo-1.0.dll.a;libpango-1.0.dll.a;libharfbuzz.dll.a;libcairo.dll.a;libgdk_pixbuf-2.0.dll.a;libgobject-2.0.dll.a;libglib-2.0.dll.a;libintl.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
