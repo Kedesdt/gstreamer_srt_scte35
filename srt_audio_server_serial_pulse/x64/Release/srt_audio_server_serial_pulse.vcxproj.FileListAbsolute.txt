@@ -1,0 +1,1 @@
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\x64\Release\srt_audio_server_serial_pulse.vcxproj.CopyComplete

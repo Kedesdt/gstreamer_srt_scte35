@@ -1,0 +1,9 @@
+﻿  srt_server.c
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(67,13): warning C4101: 'bus': unreferenced local variable
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 6 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  srt_audio_server_serial_pulse.vcxproj -> C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\x64\Release\srt_audio_server_serial_pulse.exe
+  'pwsh.exe' não é reconhecido como um comando interno
+  ou externo, um programa operável ou um arquivo em lotes.

@@ -1,0 +1,17 @@
+﻿  srt_client.c
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(29,17): warning C4098: 'serialInit': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(38,17): warning C4098: 'serialInit': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(51,21): warning C4098: 'setDtr': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(61,21): warning C4098: 'setDtr': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(78,21): warning C4098: 'setRts': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(88,21): warning C4098: 'setRts': 'void' function returning a value
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(185,59): warning C4090: '=': different 'const' qualifiers
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_client_serial_pulse\srt_client.c(175,35): warning C4101: 'event': unreferenced local variable
+  Generating code
+  2 of 10 functions (20.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  srt_audio_client_serial_pulse.vcxproj -> C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\x64\Release\srt_audio_client_serial_pulse.exe
+  'pwsh.exe' não é reconhecido como um comando interno
+  ou externo, um programa operável ou um arquivo em lotes.

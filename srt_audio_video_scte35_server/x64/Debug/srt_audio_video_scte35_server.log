@@ -1,0 +1,5 @@
+﻿  srt_server.c
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_video_scte35_server\srt_server.c(69,13): warning C4101: 'bus': unreferenced local variable
+  srt_audio_video_scte35_server.vcxproj -> C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\x64\Debug\srt_audio_video_scte35_server.exe
+  'pwsh.exe' não é reconhecido como um comando interno
+  ou externo, um programa operável ou um arquivo em lotes.
