@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="srt_server.c">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mySerial.c">
+    <ClCompile Include="outra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="mySerial.h">
+    <ClInclude Include="outra.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

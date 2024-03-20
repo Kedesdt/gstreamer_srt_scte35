@@ -3,6 +3,10 @@
 
 #include <stdbool.h>
 #include <windows.h> // Para HANDLE e DWORD
+#include <gst/gst.h>
+
+
+typedef void (*func)(GstElement*, gboolean);
 
 // Definição da estrutura MySerial
 struct MySerial {
@@ -20,5 +24,9 @@ void setRts(struct MySerial*, bool value); // método para definir RTS
 void setDtr(struct MySerial*, bool value); // método para definir DTR
 bool getDsr(struct MySerial*); // método para obter DSR
 bool getCts(struct MySerial*); // método para obter CTS
+
+void *serial_loop(func, struct MySerial*, GstElement*);
+void *loop(void*);
+
 
 #endif

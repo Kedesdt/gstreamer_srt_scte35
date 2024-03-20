@@ -1,6 +1,7 @@
 #include <gst/gst.h>
 #include <gst/mpegts/mpegts.h>
 #include <windows.h>
+//#include "serial.h"
 
 #define COM L"COM6"
 #define URI_STR "srt://10.13.24.80:8888"
@@ -14,6 +15,8 @@
 HANDLE hComm;
 DCB dcb;
 boolean dtr, rts;
+
+struct MySerial serial;
 
 
 void serialInit()

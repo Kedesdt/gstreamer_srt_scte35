@@ -18,7 +18,7 @@
     <ClCompile Include="srt_client.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="serial.c">
+    <ClCompile Include="serial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
