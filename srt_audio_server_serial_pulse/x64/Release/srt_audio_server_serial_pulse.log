@@ -1,7 +1,17 @@
-﻿  Generating code
-  5 of 16 functions (31.2%) were compiled, the rest were copied from previous compilation.
+﻿  srt_server.c
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(66,24): warning C4047: 'function': 'const char *' differs in levels of indirection from 'LPCWSTR *'
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(66,24): warning C4024: 'init': different types for formal and actual parameter 2
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(126,51): warning C4129: '{': unrecognized character escape sequence
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(126,51): warning C4129: '}': unrecognized character escape sequence
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(74,13): warning C4101: 'bus': unreferenced local variable
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(293,17): warning C4047: '=': 'LPCWSTR *' differs in levels of indirection from 'LPWSTR'
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(302,46): warning C4090: '=': different 'const' qualifiers
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(288,45): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_server_serial_pulse\srt_server.c(289,12): warning C4047: 'initializing': 'LPWSTR' differs in levels of indirection from 'LPWSTR *'
+  Generating code
+  1 of 16 functions ( 6.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   srt_audio_server_serial_pulse.vcxproj -> C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\x64\Release\srt_audio_server_serial_pulse.exe
   'pwsh.exe' não é reconhecido como um comando interno
