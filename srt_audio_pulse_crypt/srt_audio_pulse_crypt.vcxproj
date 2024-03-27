@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{228ef7d6-87a7-425a-9f2d-e1eba78698b4}</ProjectGuid>
-    <RootNamespace>srtaudioclientserialpulse</RootNamespace>
+    <ProjectGuid>{da21fa38-b727-4f2b-b2cd-67071734c2e4}</ProjectGuid>
+    <RootNamespace>srtaudiopulsecrypt</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -59,23 +59,23 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\SRT\GstreamerGio.props" />
-    <Import Project="..\srt_audio_server_serial_pulse\jansson.props" />
+    <Import Project="..\gstreamer-1.0.props" />
+    <Import Project="..\jansson.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\SRT\GstreamerGio.props" />
-    <Import Project="..\srt_audio_server_serial_pulse\jansson.props" />
+    <Import Project="..\gstreamer-1.0.props" />
+    <Import Project="..\jansson.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\srt_audio_server_serial_pulse\jansson.props" />
-    <Import Project="..\SRT\GstreamerGio.props" />
+    <Import Project="..\gstreamer-1.0.props" />
+    <Import Project="..\jansson.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\srt_audio_server_serial_pulse\jansson.props" />
-    <Import Project="..\SRT\GstreamerGio.props" />
+    <Import Project="..\jansson.props" />
+    <Import Project="..\gstreamer-1.0.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -135,7 +135,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\util\mySerial.c" />
     <ClCompile Include="srt_client.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\util\mySerial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,9 +1,10 @@
 #include <gst/gst.h>
 #include <gst/mpegts/mpegts.h>
 #include <windows.h>
-//#include "serial.h"
+#include <stdio.h>
+#include "../util/mySerial.h"
 
-#define COM L"COM7"
+#define COM L"COM6"
 #define URI_STR "srt://10.13.24.80:8888"
 
 /*
@@ -11,88 +12,7 @@
     gst-launch-1.0 -v srtsrc uri=srt://127.0.0.1:8888 ! tsdemux ! mpegaudioparse ! mpg123audiodec ! audioconvert ! autoaudiosink
 */
 
-
-HANDLE hComm;
-DCB dcb;
-boolean dtr, rts;
-
-
-void serialInit()
-{
-    dtr = 0;
-    rts = 0;
-
-    hComm = CreateFile(COM, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-    if (hComm == INVALID_HANDLE_VALUE) {
-
-        g_print("Erro ao abrir a porta serial %s.\n", COM);
-        g_print("%s", GetLastError());
-        return 1;
-    }
-
-    // Configure a porta serial
-    SecureZeroMemory(&dcb, sizeof(DCB));
-    dcb.DCBlength = sizeof(DCB);
-    if (!GetCommState(hComm, &dcb)) {
-        g_print("Erro ao obter o estado da porta serial.\n");
-        CloseHandle(hComm);
-        return 1;
-    }
-}
-
-void setDtr(boolean n) {
-    
-    if (n) 
-    {
-     
-        dcb.fDtrControl = DTR_CONTROL_ENABLE;
-        if (!SetCommState(hComm, &dcb)) {
-            g_print("Erro ao configurar a porta serial.\n");
-            CloseHandle(hComm);
-            return 1;
-        }
-    }
-    else
-    {
-
-        dcb.fDtrControl = DTR_CONTROL_DISABLE;
-        if (!SetCommState(hComm, &dcb)) {
-            g_print("Erro ao configurar a porta serial.\n");
-            CloseHandle(hComm);
-            return 1;
-        }
-
-    }
-    
-    
-}
-
-void setRts(boolean n) {
-
-    if (n)
-    {
-
-        dcb.fRtsControl = RTS_CONTROL_ENABLE;
-        if (!SetCommState(hComm, &dcb)) {
-            g_print("Erro ao configurar a porta serial.\n");
-            CloseHandle(hComm);
-            return 1;
-        }
-    }
-    else
-    {
-
-        dcb.fRtsControl = RTS_CONTROL_DISABLE;
-        if (!SetCommState(hComm, &dcb)) {
-            g_print("Erro ao configurar a porta serial.\n");
-            CloseHandle(hComm);
-            return 1;
-        }
-
-    }
-
-
-}
+struct MySerial* serial;
 
 
 void iterateSplices(GstMpegtsSCTESIT* sit) {
@@ -102,52 +22,20 @@ void iterateSplices(GstMpegtsSCTESIT* sit) {
     for (guint i = 0; i < numSplices; ++i) {
         GstMpegtsSCTESpliceEvent* spliceEvent = g_ptr_array_index(splices, i);
 
-        // Acesse os campos relevantes do spliceEvent
-        guint32 spliceEventId = spliceEvent->splice_event_id;
-        guint64 programSpliceTime = spliceEvent->program_splice_time;
-        guint32 utcSpliceTime = spliceEvent->utc_splice_time;
-
-        // Faça algo com os dados do spliceEvent (por exemplo, imprimir)
-        g_print("Splice Event ID: %u\n", spliceEventId);
-        g_print("Program Splice Time: %" G_GUINT64_FORMAT "\n", programSpliceTime);
-        g_print("UTC Splice Time: %u\n", utcSpliceTime);
-
-        g_print("%d ", spliceEvent->insert_event);
-        g_print("%d ", spliceEvent->splice_event_id);
-        g_print("%d\n ", spliceEvent->splice_event_cancel_indicator);
-
-        /* If splice_event_cancel_indicator == 0 */
-        g_print("%d ", spliceEvent->out_of_network_indicator);
-        g_print("%d ", spliceEvent->program_splice_flag);
-        g_print("%d ", spliceEvent->duration_flag);
-
-        g_print("%d ", spliceEvent->splice_immediate_flag); /* Only valid for insert_event */
-
-        g_print("%d ", spliceEvent->program_splice_time_specified); /* Only valid for insert_event && program_splice */
-        g_print("%d ", spliceEvent->program_splice_time); /* Only valid for insert_event && program_splice */
-
-        g_print("%d ", spliceEvent->utc_splice_time); /* Only valid for !insert_event (schedule) && program_splice */
-
-        g_print("%d ", spliceEvent->components); /* Only valid for !program_splice */
-
-        g_print("%d ", spliceEvent->break_duration_auto_return);
-        g_print("%d ", spliceEvent->break_duration);
-
-        g_print("%d ", spliceEvent->unique_program_id);
-        g_print("%d ", spliceEvent->avail_num);
-        g_print("%d\n", spliceEvent->avails_expected);
-
+        
         if (spliceEvent->splice_event_id == 1)
-        {
-            setDtr(1);
+        {   
+            g_print("Local\n");
+            setDtr(serial, 1);
             g_usleep(500000);
-            setDtr(0);
+            setDtr(serial, 0);
         }
         else if (spliceEvent->splice_event_id == 2)
         {
-            setRts(1);
+            g_print("Rede\n");
+            setRts(serial, 1);
             g_usleep(500000);
-            setRts(0);
+            setRts(serial, 0);
         }
     }
 }
@@ -167,7 +55,7 @@ static void on_pad_added(GstElement* element, GstPad* pad, gpointer data) {
 }
 
 static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data) {
-    
+
     switch (GST_MESSAGE_TYPE(msg)) {
     case GST_MESSAGE_ELEMENT: {
 
@@ -199,9 +87,23 @@ static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data) {
 int main(int argc, char* argv[]) {
 
 
-    serialInit();
-    setDtr(0);
-    setRts(0);
+    LPCWSTR port[10];
+    printf("Digite a porta COM: ");
+    scanf_s("%9ls", port);
+
+    char uri[100];
+    printf("Digite a uri Ex: srt://10.13.24.80:8888 : ");
+    scanf_s("%99s", uri);
+
+    g_print("URI %s\n", uri);
+    g_print("Porta %ls\n", port);
+
+    serial = (struct MySerial*)malloc(sizeof(struct MySerial));
+
+    init(serial, port);
+    setRts(serial, FALSE);
+    setDtr(serial, FALSE);
+    g_print("Serial Iniciado\n");
 
 
     GstElement* pipeline, * demux, * source, * mp3Parse, * audioDecoder, * audioConvert, * sink;
@@ -223,13 +125,17 @@ int main(int argc, char* argv[]) {
     gst_bus_add_watch(bus, bus_call, NULL);
     gst_object_unref(bus);
 
-    g_print("pipeline: %s", pipeline);
+
     if (!pipeline || !source || !demux || !mp3Parse || !audioDecoder || !audioConvert || !sink) {
         g_printerr("Não foi possível criar um ou mais elementos.\n");
         return -1;
     }
 
-    g_object_set(G_OBJECT(source), "uri", URI_STR, NULL);
+    //Authentication SRT
+    g_object_set(G_OBJECT(source), "authentication", TRUE, NULL);
+    g_object_set(G_OBJECT(source), "passphrase", "ExGA8.w8-@", NULL);
+
+    g_object_set(G_OBJECT(source), "uri", uri, NULL);
     g_object_set(G_OBJECT(demux), "send-scte35-events", TRUE, NULL);
     g_object_set(G_OBJECT(demux), "emit-stats", TRUE, NULL);
 
@@ -287,7 +193,7 @@ int main(int argc, char* argv[]) {
     gst_object_unref(pipeline);
     g_main_loop_unref(loop);
 
-    CloseHandle(hComm);
+    destroy(serial);
 
     return 0;
 }

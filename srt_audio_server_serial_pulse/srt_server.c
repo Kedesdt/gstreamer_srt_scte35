@@ -2,7 +2,11 @@
 #include <gst/mpegts/mpegts.h>
 #include <glib.h>
 #include <windows.h>
+#include <stdio.h>
+#include <jansson.h>
 #include "mySerial.h"
+
+#define URI "srt://:8888"
 
 /* Pipeline que funciona AAC:
 gst-launch-1.0 -v audiotestsrc wave=sine do-timestamp=true ! audioconvert ! audioresample ! "audio/x-raw,format=S16LE,channels=2,rate=48000" ! voaacenc ! aacparse ! queue ! mpegtsmux name=mux ! srtserversink uri=srt://:8888
@@ -15,64 +19,60 @@ gst-launch-1.0 -v audiotestsrc wave=sine do-timestamp=true ! audioconvert ! audi
 
 struct MySerial* serial;
 GstElement* volume;
+struct Config {
+    LPCWSTR* com;
+    char* uri;
+};
 
-static void
-send_splice(GstElement* mux, gboolean out)
-{
-    GstMpegtsSCTESIT* sit;
-    GstMpegtsSection* section;
+static void send_splice(GstElement*, gboolean);
+static gboolean send_splice_in(GstElement*);
+static gboolean send_splice_out(GstElement*);
+static int configuration(struct Config*);
 
-    g_print("Sending Splice %s event\n", out ? "Out" : "In");
-
-    /* Splice is at 5s for 30s */
-    if (out) {
-        sit = gst_mpegts_scte_splice_out_new(1, 5 * GST_SECOND, 30 * GST_SECOND);
-        g_object_set(G_OBJECT(volume), "mute", TRUE, NULL);
-    }
-    else {
-        sit = gst_mpegts_scte_splice_in_new(2, 35 * GST_SECOND);
-        g_object_set(G_OBJECT(volume), "mute", FALSE, NULL);
-    }
-
-    section = gst_mpegts_section_from_scte_sit(sit, 123);
-    if (gst_mpegts_section_send_event(section, mux) == TRUE)
-    {
-        g_print("Enviado\n");
-    }
-    else
-    {
-        g_print("Nao Enviado\n");
-    }
-    gst_mpegts_section_unref(section);
-}
-
-static gboolean
-send_splice_in(GstElement* mux)
-{
-    send_splice(mux, FALSE);
-    g_object_set(G_OBJECT(volume), "mute", FALSE, NULL);
-
-    return G_SOURCE_REMOVE;
-}
-
-static gboolean
-send_splice_out(GstElement* mux)
-{
-    send_splice(mux, TRUE);
-    g_object_set(G_OBJECT(volume), "mute", TRUE, NULL);
-    
-
-    return G_SOURCE_REMOVE;
-}
 
 int main(int argc, char* argv[]) {
 
+    g_print("Iniciando.....\n");
 
-    g_print("Iniciando\n");
+    struct Config* config = (struct Config*)malloc(sizeof(struct Config));
+    config->com = (LPCWSTR*)malloc(100 * sizeof(WCHAR));
+    config->uri = (char*)malloc(100 * sizeof(char));
 
+    if (config->com == NULL) {
+        fprintf(stderr, "Erro ao alocar memória para LPCWSTR\n");
+        return 1;
+    }
+    if (config->uri == NULL) {
+        fprintf(stderr, "Erro ao alocar memória para string\n");
+        return 1;
+    }
+
+    configuration(config);
+    char uri[100];
+
+    for (int i = 0; config->uri[i] != '\0'; i++) {
+        //printf("%d: Caractere: %c, Valor ASCII: %d\n", i, config->uri[i], (int)config->uri[i]);
+        uri[i] = config->uri[i];
+    }
+
+    /*
+    LPCWSTR port[10];
+    printf("Digite a porta COM: ");
+    scanf_s("%9ls", port);
+
+    printf("Digite a uri Ex: srt://10.13.24.80:8888 : ");
+    scanf_s("%99s", uri);
+
+    g_print("URI %s\n", uri);
+    g_print("Porta %ls\n", port);
+    
+    for (int i = 0; uri[i] != '\0'; i++) {
+        printf("%d: Caractere: %c, Valor ASCII: %d\n", i, uri[i], (int)uri[i]);
+    }*/
+    
     serial = (struct MySerial*)malloc(sizeof(struct MySerial));
 
-    init(serial, L"COM7");
+    init(serial, config->com);
     setRts(serial, TRUE);
     g_print("Serial Iniciado\n");
 
@@ -128,20 +128,22 @@ int main(int argc, char* argv[]) {
     gst_caps_unref(caps);
 
 
-    g_object_set(G_OBJECT(sink), "uri", "srt://:8888", NULL);
+    g_object_set(G_OBJECT(sink), "uri", (uri), NULL);
 
    
     g_object_set(G_OBJECT(audioSource), "device", "\{0.0.1.00000000\}.\{eb8a86c3-c59a-4129-ac6a-fa4886311551\}", NULL);
-    //g_object_set(G_OBJECT(audioSource), "index", 0, NULL);
+
 
     //SCTE 35 ENABLE
     g_object_set(muxer, "scte-35-pid",           500,       NULL);
     g_object_set(muxer, "scte-35-null-interval", 450000000, NULL);
 
-    const gchar* device_value;
 
-    g_object_get(audioSource, "device", &device_value,  NULL);
-    g_print("Valor da propriedade \"device\": %s\n", device_value);
+    //SRT authentication
+
+    g_object_set(G_OBJECT(sink), "authentication", TRUE, NULL);
+    g_object_set(G_OBJECT(sink), "passphrase", "ExGA8.w8-@", NULL);
+
 
     gst_bin_add_many(GST_BIN(pipeline), audioSource, audioFilter, audioFilter2, volume, audioResample, audioEncoder, audioConvert, mp3Parse, audioQueue,
                                         muxer,       sink,        NULL);
@@ -214,7 +216,101 @@ int main(int argc, char* argv[]) {
     gst_object_unref(pipeline);
     g_main_loop_unref(loop);
 
+    free(config->com);
+    free(config->uri);
+    free(config);
+
     return 0;
 
+}
 
+static int 
+configuration(struct Config* config) {
+    
+    json_error_t error;
+    json_t* root = json_load_file("config.json", 0, &error);
+    json_t* com;
+    json_t* uri_json;
+
+    if (!root) {
+        fprintf(stderr, "Erro ao ler o arquivo JSON: %s\n", error.text);
+        return 1;
+    }
+
+    com = json_object_get(root, "COM");
+    if (!json_is_string(com)) {
+        fprintf(stderr, "COM não é uma string\n");
+        json_decref(root);
+        return 1;
+    }
+
+    const char* comString = json_string_value(com);
+    int comStringLength = strlen(comString) + 1;
+    LPWSTR comLPCWSTR = (LPWSTR*)malloc(comStringLength * sizeof(WCHAR));
+
+    MultiByteToWideChar(CP_ACP, 0, comString, -1, comLPCWSTR, comStringLength);
+
+    config->com = comLPCWSTR;
+
+    uri_json = json_object_get(root, "URI");
+    if (!json_is_string(uri_json)) {
+        fprintf(stderr, "URI não é uma string\n");
+        json_decref(root);
+        return 1;
+    }
+
+    config->uri = json_string_value(uri_json);
+
+    g_print("COM: %s\nURI: %s\n", json_string_value(com), config->uri);
+
+    json_decref(root);
+    return 0;
+}
+static void
+send_splice(GstElement* mux, gboolean out)
+{
+    GstMpegtsSCTESIT* sit;
+    GstMpegtsSection* section;
+
+    g_print("Sending Splice %s event\n", out ? "Out" : "In");
+
+    /* Splice is at 5s for 30s */
+    if (out) {
+        sit = gst_mpegts_scte_splice_out_new(1, 5 * GST_SECOND, 30 * GST_SECOND);
+        g_object_set(G_OBJECT(volume), "mute", TRUE, NULL);
+    }
+    else {
+        sit = gst_mpegts_scte_splice_in_new(2, 35 * GST_SECOND);
+        g_object_set(G_OBJECT(volume), "mute", FALSE, NULL);
+    }
+
+    section = gst_mpegts_section_from_scte_sit(sit, 123);
+    if (gst_mpegts_section_send_event(section, mux) == TRUE)
+    {
+        g_print("Enviado\n");
+    }
+    else
+    {
+        g_print("Nao Enviado\n");
+    }
+    gst_mpegts_section_unref(section);
+}
+
+static gboolean
+send_splice_in(GstElement* mux)
+{
+    send_splice(mux, FALSE);
+    g_object_set(G_OBJECT(volume), "mute", FALSE, NULL);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gboolean
+send_splice_out(GstElement* mux)
+{
+    send_splice(mux, TRUE);
+    g_object_set(G_OBJECT(volume), "mute", TRUE, NULL);
+
+
+    return G_SOURCE_REMOVE;
 }
