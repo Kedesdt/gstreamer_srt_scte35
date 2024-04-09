@@ -20,6 +20,7 @@ GstElement* volume;
 struct Config {
     LPCWSTR* com;
     char* uri;
+    char* device;
 };
 
 static void send_splice(GstElement*, gboolean);
@@ -34,13 +35,10 @@ int main(int argc, char* argv[]) {
     struct Config* config = (struct Config*)malloc(sizeof(struct Config));
     config->com = (LPCWSTR*)malloc(100 * sizeof(WCHAR));
     config->uri = (char*)malloc(100 * sizeof(char));
+    config->device = (char*)malloc(100 * sizeof(char));
 
-    if (config->com == NULL) {
-        g_print("Erro ao alocar memória para LPCWSTR\n");
-        return 1;
-    }
-    if (config->uri == NULL) {
-        g_print("Erro ao alocar memória para string\n");
+    if (config->com == NULL || config->uri == NULL || config->device == NULL) {
+        g_print("Erro ao alocar memória\n");
         return 1;
     }
 
@@ -59,7 +57,19 @@ int main(int argc, char* argv[]) {
         uri[i] = config->uri[i];
     }
 
-    g_print("URI: %s\n", uri);
+    for (size = 0; config->device[size] != '\0'; size++) {
+        ;
+    }
+
+    char* device;
+    device = (char*)malloc((size + 1) * sizeof(char));
+
+    for (int i = 0; config->device[i - 1] != '\0'; i++) {
+        device[i] = config->device[i];
+    }
+
+    g_print("URI   : %s\n"
+            "DEVICE: %s\n" , uri, device);
 
     serial = (struct MySerial*)malloc(sizeof(struct MySerial));
 
@@ -121,10 +131,11 @@ int main(int argc, char* argv[]) {
 
 
     g_object_set(G_OBJECT(sink), "uri", uri, NULL);
+    free(uri);
 
 
-    g_object_set(G_OBJECT(audioSource), "device", "\{0.0.1.00000000\}.\{eb8a86c3-c59a-4129-ac6a-fa4886311551\}", NULL);
-    //g_object_set(G_OBJECT(audioSource), "index", 0, NULL);
+    //g_object_set(G_OBJECT(audioSource), "device", "\{0.0.1.00000000\}.\{eb8a86c3-c59a-4129-ac6a-fa4886311551\}", NULL);
+    g_object_set(G_OBJECT(audioSource), "device", device, NULL);
 
     //SCTE 35 ENABLE
     g_object_set(muxer, "scte-35-pid", 500, NULL);
@@ -271,6 +282,7 @@ configuration(struct Config* config) {
     json_t* root = json_load_file("config.json", 0, &error);
     json_t* com;
     json_t* uri_json;
+    json_t* device_path;
 
     if (!root) {
         fprintf(stderr, "Erro ao ler o arquivo JSON: %s\n", error.text);
@@ -301,7 +313,20 @@ configuration(struct Config* config) {
 
     config->uri = json_string_value(uri_json);
 
-    g_print("COM: %s\nURI: %s\n", json_string_value(com), config->uri);
+    device_path = json_object_get(root, "DEVICE");
+
+    if (!json_is_string(device_path)) {
+        fprintf(stderr, "Device não é uma string\n");
+        json_decref(root);
+        return 1;
+    }
+
+    config->device = json_string_value(device_path);
+
+    g_print(
+    "COM    : %s\n"
+    "URI    : %s\n"
+    "DEVICE : %s\n", json_string_value(com), config->uri, config->device);
 
     json_decref(root);
     return 0;
