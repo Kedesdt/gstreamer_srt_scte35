@@ -19,7 +19,7 @@ struct MySerial {
 };
 
 // Métodos (funções) associados à estrutura
-void init(struct MySerial*, const char* com);   // 
+void init(struct MySerial*, const LPCWSTR com);   // 
 void destroy(struct MySerial*);
 void setRts(struct MySerial*, bool value); // método para definir RTS
 void setDtr(struct MySerial*, bool value); // método para definir DTR

@@ -2,93 +2,81 @@
 #include <gst/gst.h>
 #include <stdio.h>
 
+#define MAX_ITEMS 10
+#define MAX_STR 50
 
-// Função para listar as portas seriais
-void listar_portas_seriais(GtkComboBoxText* combobox);
 
-// Função para listar os dispositivos de áudio
-void listar_dispositivos_audio(GtkComboBoxText* combobox);
+void listar_backends_audio(char**);
 
-void listar_backends_audio(GtkComboBoxText* combobox);
-
-int main(int argc, char* argv[]) {
+static void print_hello(GtkWidget* widget, gpointer data)
+{
+    g_print("Hello World\n");
+}
+void modificar_array(char* items[]) {
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        //printf("..%s\n", items[i]);
+        if (items[i] != NULL) {
+            strcat_s(items[i], 50, " modificado");
+        }
+        //printf("%s", items[i]);
+    }
+}
+static void activate(GtkApplication* app, gpointer user_data)
+{
     GtkWidget* window;
-    GtkWidget* combobox_portas, * combobox_audio, * combobox_backends;
+    GtkWidget* button;
+    GtkWidget* dropdown;
     GtkWidget* vbox;
 
-    gtk_init(&argc, &argv);
+    char** inputs = malloc(MAX_ITEMS * sizeof(char*));
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Selecionar Porta e Áudio");
-    gtk_window_set_default_size(GTK_WINDOW(window), 200, 100);
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        // Aloca memória para cada string
+        inputs[i] = malloc(MAX_STR * sizeof(char));
+        strcpy_s(inputs[i], MAX_STR, "TESTE");
+        printf("%s\n", inputs[i]);
+    }
+
+    window = gtk_application_window_new(app);
+    gtk_window_set_title(GTK_WINDOW(window), "Hello");
+    gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_window_set_child(GTK_WINDOW(window), vbox);
 
-    combobox_backends = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(vbox), combobox_backends, TRUE, TRUE, 0);
-    listar_backends_audio(combobox_backends);
+    button = gtk_button_new_with_label("Hello World");
+    g_signal_connect(button, "clicked", G_CALLBACK(print_hello), NULL);
+    gtk_box_append(GTK_BOX(vbox), button);
 
-    combobox_portas = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(vbox), combobox_portas, TRUE, TRUE, 0);
-    listar_portas_seriais(GTK_COMBO_BOX_TEXT(combobox_portas));
+    listar_backends_audio(inputs);
 
-    combobox_audio = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(vbox), combobox_audio, TRUE, TRUE, 0);
-    listar_dispositivos_audio(GTK_COMBO_BOX_TEXT(combobox_audio));
+    dropdown = gtk_drop_down_new_from_strings(inputs);
+    gtk_box_append(GTK_BOX(vbox), dropdown);
+    gtk_window_present(GTK_WINDOW(window));
+}
+int main(int    argc,
+    char** argv)
+{
+    GtkApplication* app;
+    int status;
 
-    gtk_widget_show_all(window);
+    app = gtk_application_new("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
 
-    gtk_main();
-    return 0;
+    return status;
 }
 
-void listar_dispositivos_audio(GtkComboBoxText* combobox) {
-    GstDeviceMonitor* monitor;
-    GstDevice* device;
-    GList* devices, * elem;
-    GstStructure* props;
-    const gchar* klass, * display_name, * backend;
+void listar_backends_audio(char** items) {
 
-    gst_init(NULL, NULL);
-
-    monitor = gst_device_monitor_new();
-    gst_device_monitor_start(monitor);
-
-    devices = gst_device_monitor_get_devices(monitor);
-    for (elem = devices; elem; elem = elem->next) {
-        device = GST_DEVICE(elem->data);
-        klass = gst_device_get_device_class(device);
-        if (g_strrstr(klass, "Audio/Source")) {
-            display_name = gst_device_get_display_name(device);
-            props = gst_device_get_properties(device);
-            backend = gst_structure_get_string(props, "device.api");
-            gchar* device_info = g_strdup_printf("%s (%s)", display_name, backend ? backend : "Unknown API");
-            gtk_combo_box_text_append_text(combobox, device_info);
-            g_free(device_info);
-            gst_structure_free(props);
-        }
-        g_object_unref(device);
-    }
-    g_list_free(devices);
-    g_object_unref(monitor);
-}
-
-void listar_portas_seriais(GtkComboBoxText* combobox) {
-    for (int i = 1; i <= 15; i++) {
-        char port_name[10];
-        snprintf(port_name, sizeof(port_name), "COM%d", i);
-        gtk_combo_box_text_append_text(combobox, port_name);
-    }
-}
-
-void listar_backends_audio(GtkComboBoxText* combobox) {
     GstDeviceMonitor* monitor;
     GstDevice* device;
     GList* devices, * elem;
     GstStructure* props;
     GHashTable* backends_hash = g_hash_table_new(g_str_hash, g_str_equal);
     gchar* backend;
+    int index = 0;
 
     gst_init(NULL, NULL);
 
@@ -104,7 +92,9 @@ void listar_backends_audio(GtkComboBoxText* combobox) {
 
         if (backend && !g_hash_table_contains(backends_hash, backend)) {
             g_hash_table_insert(backends_hash, backend, backend);
-            gtk_combo_box_text_append_text(combobox, backend);
+            printf("%i: %s\n", index, backend);
+            strcpy_s(items[index], MAX_STR, backend);
+            index++;
         }
         else {
             g_free(backend);
@@ -113,7 +103,29 @@ void listar_backends_audio(GtkComboBoxText* combobox) {
         gst_structure_free(props);
         g_object_unref(device);
     }
+    items[index] = NULL;
     g_list_free(devices);
     g_object_unref(monitor);
     g_hash_table_destroy(backends_hash);
 }
+
+/*int main() {
+
+    char** inputs = malloc(MAX_ITEMS * sizeof(char*));
+
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        // Aloca memória para cada string
+        inputs[i] = malloc(MAX_STR * sizeof(char));
+        strcpy_s(inputs[i], MAX_STR, "TESTE");
+        printf("%s\n", inputs[i]);
+    }
+    listar_backends_audio(inputs);
+
+    printf("saiu da função");
+
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        printf("%s", inputs[i]);
+    }
+
+    return 0;
+}*/

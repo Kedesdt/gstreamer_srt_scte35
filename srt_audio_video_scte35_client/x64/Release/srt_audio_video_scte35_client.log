@@ -1,11 +1,2 @@
 ﻿C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_video_scte35_client\srt_audio_video_scte35_client.vcxproj(78,5): warning MSB4011: "C:\gstreamer\1.0\msvc_x86_64\share\vs\2010\libs\gstreamer-1.0.props" cannot be imported again. It was already imported at "C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\SRT\GstreamerGio.props (4,5)". This is most likely a build authoring error. This subsequent import will be ignored. 
-  srt_client.c
-C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_video_scte35_client\srt_client.c(90,59): warning C4090: '=': different 'const' qualifiers
-C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\srt_audio_video_scte35_client\srt_client.c(78,35): warning C4101: 'event': unreferenced local variable
-  Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 5 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
   srt_audio_video_scte35_client.vcxproj -> C:\Users\kdtorres\Documents\Programacao\gstreamer\tutorials\vs2010\x64\Release\srt_audio_video_scte35_client.exe
-  'pwsh.exe' não é reconhecido como um comando interno
-  ou externo, um programa operável ou um arquivo em lotes.

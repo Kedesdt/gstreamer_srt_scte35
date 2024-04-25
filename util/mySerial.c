@@ -37,8 +37,9 @@ struct Param {
 void* loop(void* args) {
 
     struct Param* params = (struct Param*)args;
+    g_print("Loop Serial Iniciado");
 
-    while (1) {
+    while (params->serial->running) {
 
         g_usleep(5000);
         if (getDsr(params->serial)) {
@@ -50,7 +51,9 @@ void* loop(void* args) {
             params->f(params->muxer, TRUE);
             g_usleep(2000000);
         }
+
     }
+    g_print("Loop Serial Finalizado\n");
     return NULL;
 }
 
@@ -64,9 +67,6 @@ void* serial_loop(funcao f, struct MySerial* serial, GstElement * muxer) {
 
     if (pthread_create(&thread_id, NULL, loop, params) != 0) {
         g_print("Erro ao criar thread");
-    }
-    else {
-        g_print("Loop Serial Iniciado");
     }
 
     return NULL;
@@ -109,10 +109,11 @@ void init(struct MySerial* serial, const LPCWSTR com) {
         CloseHandle(serial->hComm);
         return;
     }
+    serial->running = 1;
 
 }
 
-void setRts(struct MySerial* serial, bool value) {
+void setRts(struct MySerial* serial, int value) {
     if (value) {
         serial->dcb.fRtsControl = RTS_CONTROL_ENABLE;
         g_print("RTS SET ENABLE\n");
@@ -129,7 +130,7 @@ void setRts(struct MySerial* serial, bool value) {
     }
 }
 
-void setDtr(struct MySerial* serial, bool value) {
+void setDtr(struct MySerial* serial, int value) {
     if (value)
         serial->dcb.fDtrControl = DTR_CONTROL_ENABLE;
     else
@@ -140,7 +141,7 @@ void setDtr(struct MySerial* serial, bool value) {
     }
 }
 
-bool getDsr(struct MySerial* serial) {
+int getDsr(struct MySerial* serial) {
 
     if (!GetCommModemStatus(serial->hComm, &serial->dwModemStatus)) {
         g_print("Erro ao obter o status do modem.\n");
@@ -150,7 +151,7 @@ bool getDsr(struct MySerial* serial) {
     return (serial->dwModemStatus & MS_DSR_ON) != 0;
 }
 
-bool getCts(struct MySerial* serial) {
+int getCts(struct MySerial* serial) {
 
     if (!GetCommModemStatus(serial->hComm, &serial->dwModemStatus)) {
         g_print("Erro ao obter o status do modem.\n");
