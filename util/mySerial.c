@@ -37,10 +37,12 @@ struct Param {
 void* loop(void* args) {
 
     struct Param* params = (struct Param*)args;
-    g_print("Loop Serial Iniciado");
+    g_print("Loop Serial Iniciado\n");
+    
+    g_print("parametro Serial->running: %d\n", params->serial->running);
 
-    while (params->serial->running) {
-
+    while (params->serial->running == 1) {
+        
         g_usleep(5000);
         if (getDsr(params->serial)) {
 
@@ -94,12 +96,14 @@ void init(struct MySerial* serial, const LPCWSTR com) {
     g_print("Aberta\n");
     if (serial->hComm == INVALID_HANDLE_VALUE) {
         g_print("Erro ao abrir a porta serial.\n");
+        serial->running = 0;
         return;
     }
     // Obtenha o status do modem
     if (!GetCommModemStatus(serial->hComm, &serial->dwModemStatus)) {
         g_print("Erro ao obter o status do modem.\n");
         CloseHandle(serial->hComm);
+        serial->running = 0;
         return;
     }
     SecureZeroMemory(&serial->dcb, sizeof(DCB));
@@ -107,6 +111,7 @@ void init(struct MySerial* serial, const LPCWSTR com) {
     if (!GetCommState(serial->hComm, &serial->dcb)) {
         g_print("Erro ao obter o estado da porta serial.\n");
         CloseHandle(serial->hComm);
+        serial->running = 0;
         return;
     }
     serial->running = 1;
@@ -125,6 +130,7 @@ void setRts(struct MySerial* serial, int value) {
 
     if (!SetCommState(serial->hComm, &serial->dcb)) {
         g_print("Erro ao configurar a porta serial.\n");
+        serial->running = 0;
         CloseHandle(serial->hComm);
 
     }
@@ -138,6 +144,7 @@ void setDtr(struct MySerial* serial, int value) {
     if (!SetCommState(serial->hComm, &serial->dcb)) {
         g_print("Erro ao configurar a porta serial.\n");
         CloseHandle(serial->hComm);
+        serial->running = 0;
     }
 }
 
@@ -146,6 +153,7 @@ int getDsr(struct MySerial* serial) {
     if (!GetCommModemStatus(serial->hComm, &serial->dwModemStatus)) {
         g_print("Erro ao obter o status do modem.\n");
         CloseHandle(serial->hComm);
+        serial->running = 0;
         return 0;
     }
     return (serial->dwModemStatus & MS_DSR_ON) != 0;
@@ -156,6 +164,7 @@ int getCts(struct MySerial* serial) {
     if (!GetCommModemStatus(serial->hComm, &serial->dwModemStatus)) {
         g_print("Erro ao obter o status do modem.\n");
         CloseHandle(serial->hComm);
+        serial->running = 0;
         return 0;
     }
     return (serial->dwModemStatus & MS_CTS_ON) != 0;
@@ -163,6 +172,7 @@ int getCts(struct MySerial* serial) {
 
 void destroy(struct MySerial* serial) {
     CloseHandle(serial->hComm);
+
     free(serial);
 }
 

@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>C:\jansson\jansson-2.13\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\jansson\jansson-2.13\build\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\jansson\jansson-2.13\build\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>jansson.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
