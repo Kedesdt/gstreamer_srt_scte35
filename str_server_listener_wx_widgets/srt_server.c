@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <windows.h>
 #include <jansson.h>
+#include <locale.h>
 #include "mySerial.h"
 #include "srt_server.h"
 
@@ -17,7 +18,7 @@ void srt_server(struct Config* config) {
 
     pthread_t thread_id;
 
-    g_print("Endereco config: %d", config);
+    //g_print("Endereco config: %d", config);
     //struct Config* config = (struct Config*)malloc(sizeof(struct Config));
 
     if (pthread_create(&thread_id, NULL, init_srt_server, config) != 0) {
@@ -46,7 +47,7 @@ void* init_srt_server(void* args) {
 
     struct Config* config = (struct Config*)args;
     //init_srt(config);
-    g_print("Endereco config: %d", config);
+    //g_print("Endereco config: %d", config);
     srt_main(config);
 
     return NULL;
@@ -106,7 +107,7 @@ int srt_main(struct Config* config) {
     }
 
     g_print("URI   : %s\n"
-        "DEVICE: %s\n", uri, device);
+            "DEVICE: %s\n", uri, device);
 
     serial = (struct MySerial*)malloc(sizeof(struct MySerial));
 
@@ -148,8 +149,25 @@ int srt_main(struct Config* config) {
     }
 
     //Authentication SRT
+    g_print("Autenticaçao ativada\n");
     g_object_set(G_OBJECT(sink), "authentication", TRUE, NULL);
-    g_object_set(G_OBJECT(sink), "passphrase", "ExGA8.w8-@", NULL);
+    g_object_set(G_OBJECT(sink), "passphrase", "password-123", NULL);
+    //g_object_set(G_OBJECT(sink), "passphrase", "ExGA8.w8-@", NULL);
+
+
+    const gchar* resposta;
+
+    g_object_get(sink, "authentication", &resposta, NULL);
+    g_print("Valor da propriedade \"authentication\": %d\n", resposta);
+    //g_object_get(sink, "passphrase", &resposta, NULL);
+    //g_print("Valor da propriedade \"authentication\": %s\n", resposta);
+
+
+    g_object_set(audioEncoder, "target" , 1   ,
+                               "cbr"    , TRUE,
+                               "bitrate", 128  , 
+                               NULL);
+
 
     caps = gst_caps_new_simple("audio/x-raw",
         "format", G_TYPE_STRING, "F32LE",
@@ -168,8 +186,12 @@ int srt_main(struct Config* config) {
     g_object_set(G_OBJECT(audioFilter2), "caps", caps, NULL);
     gst_caps_unref(caps);
 
-
-    g_object_set(G_OBJECT(sink), "uri", uri, NULL);
+    //g_object_set(G_OBJECT(sink), "authentication", TRUE, NULL);
+    //g_object_set(G_OBJECT(sink), "passphrase", "ExGA8.w8-@", NULL);
+    g_object_set(G_OBJECT(sink), "uri", uri,
+                                 "authentication", FALSE, 
+                                 "passphrase",     "ExGA8.w8-@", 
+                                 NULL);
     free(uri);
 
     g_object_set(G_OBJECT(audioSource), "device", device, NULL);

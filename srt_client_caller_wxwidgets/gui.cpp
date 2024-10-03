@@ -12,9 +12,15 @@
 #include "../sample.xpm"
 #endif
 
+#define TEXT_COLOR "#f7f8fc"
+#define BACKGROUND_COLOR "#314c53"
+#define BUTTON_BACKGROUND_COLOR "#f7f8fc"
+#define F_COLOUR_1 "#1BB0CE"
+#define F_COLOUR_2 "#4F8699"
+
 #define API "wasapi"
-//#define ENDERECO "srt://200.15.1.70:%s"
-#define ENDERECO "srt://10.13.24.80:%s" // Para teste
+#define ENDERECO "srt://200.15.1.70:%s"
+//#define ENDERECO "srt://10.13.24.80:%s" // Para teste
 
 struct Config* config = (struct Config*)malloc(sizeof(struct Config));
 
@@ -49,6 +55,7 @@ private:
     wxStaticText* labelComboBoxDevices;
     wxStaticText* labelComboBoxPort;
     wxStaticText* labelPortTextCtrl;
+    wxStatusBar* statusBar;
     wxDECLARE_EVENT_TABLE();
 };
 
@@ -85,7 +92,15 @@ bool MyApp::OnInit()
 MyFrame::MyFrame(const wxString& title)
     : wxFrame(NULL, wxID_ANY, title)
 {
-    SetIcon(wxICON(sample));
+    SetIcon(wxIcon("./icone.ico", wxBITMAP_TYPE_ICO));
+
+    wxColour bgColour(BACKGROUND_COLOR);
+    wxColour textColour(TEXT_COLOR);
+    wxColour buttonBackgroundColour(BUTTON_BACKGROUND_COLOR);
+    wxColour fColour1(F_COLOUR_1);
+    wxColour fColour2(F_COLOUR_2);
+
+    SetBackgroundColour(bgColour);
     int size1 = 20, size2 = 100;
     char** list = (char**)malloc(size1 * sizeof(char*));
 
@@ -94,17 +109,25 @@ MyFrame::MyFrame(const wxString& title)
 
     this->startButton = new wxButton(this, Minimal_Start, wxT("Start"), wxDefaultPosition, wxDefaultSize, 0);
     this->startButton->SetToolTip(wxT("Clique aqui para iniciar o srt_server"));
+    this->startButton->SetBackgroundColour(buttonBackgroundColour);
     this->stopButton = new wxButton(this, Minimal_Stop, wxT("Stop"), wxDefaultPosition, wxDefaultSize, 0);
     this->stopButton->SetToolTip(wxT("Clique aqui para parar o srt_server"));
+    this->stopButton->SetBackgroundColour(buttonBackgroundColour);
     this->comboBoxDevices = new wxComboBox(this, wxID_ANY);
+    this->comboBoxDevices->SetBackgroundColour(buttonBackgroundColour);
     this->comboBoxPort = new wxComboBox(this, wxID_ANY);
+    this->comboBoxPort->SetBackgroundColour(buttonBackgroundColour);
     this->portTextCtrl = new wxTextCtrl(this, wxID_ANY);
+    this->portTextCtrl->SetBackgroundColour(buttonBackgroundColour);
 
     //labels
 
-    labelComboBoxDevices = new wxStaticText(this, wxID_ANY, wxT("Device"));
-    labelComboBoxPort = new wxStaticText(this, wxID_ANY, wxT("Porta"));
-    labelPortTextCtrl = new wxStaticText(this, wxID_ANY, wxT("Porta SRT"));
+    labelComboBoxDevices = new wxStaticText(this, wxID_ANY, wxT("DEVICE"));
+    labelComboBoxDevices->SetForegroundColour(textColour);
+    labelComboBoxPort = new wxStaticText(this, wxID_ANY, wxT("PORTA COM"));
+    labelComboBoxPort->SetForegroundColour(textColour);
+    labelPortTextCtrl = new wxStaticText(this, wxID_ANY, wxT("PORTA SRT"));
+    labelPortTextCtrl->SetForegroundColour(textColour);
 
     if (list == NULL) {
         printf("Erro! Falha na alocação de memória.\n");
@@ -141,8 +164,10 @@ MyFrame::MyFrame(const wxString& title)
     //this->Fit();
 
 #if wxUSE_STATUSBAR
-    CreateStatusBar(2);
+    this->statusBar = CreateStatusBar(2);
     SetStatusText("SRT CLIENT");
+    this->statusBar->SetBackgroundColour(buttonBackgroundColour);
+
 #endif
 }
 
@@ -215,5 +240,6 @@ void MyFrame::OnStop(wxCommandEvent & WXUNUSED(event)) {
     *config->running = 0;
     *config->stop = 1;
     stop_loop();
+
 
 }

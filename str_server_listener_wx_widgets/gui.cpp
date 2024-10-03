@@ -3,6 +3,7 @@
 #include "gst_util.h"
 #include <iostream>
 #include <codecvt>
+#include <locale.h>
 
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
@@ -70,6 +71,8 @@ bool MyApp::OnInit()
 {
     if (!wxApp::OnInit())
         return false;
+
+    setlocale(LC_ALL, "");
 
     MyFrame* frame = new MyFrame("SRT SERVER");
     frame->Show(true);

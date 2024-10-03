@@ -178,10 +178,14 @@ int srt_client_main(struct Config * config) {
         return -1;
     }
 
+
     //Authentication SRT
-    g_object_set(G_OBJECT(source), "authentication", TRUE, NULL);
-    g_object_set(G_OBJECT(source), "passphrase", "ExGA8.w8-@", NULL);
-    g_object_set(G_OBJECT(source), "uri", uri, NULL);
+    //g_object_set(G_OBJECT(source), "authentication", TRUE, NULL);
+    //g_object_set(G_OBJECT(source), "passphrase", "ExGA8.w8-@", NULL);
+    g_object_set(G_OBJECT(source), "authentication", TRUE, 
+                                   "uri", uri,
+                                   "passphrase", "ExGA8.w8-@",
+                                    NULL);
     g_object_set(G_OBJECT(sink), "device", device, NULL);
     g_object_set(G_OBJECT(demux), "send-scte35-events", TRUE, NULL);
     g_object_set(G_OBJECT(demux), "emit-stats", TRUE, NULL);
@@ -234,11 +238,11 @@ int srt_client_main(struct Config * config) {
 
     loop_gst = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop_gst);
-
+    
     // Limpeza
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
-    g_main_loop_unref(loop);
+    g_main_loop_unref(loop_gst);
     free(config->uri);
     free(config->running);
     free(config->stop);
@@ -247,7 +251,6 @@ int srt_client_main(struct Config * config) {
     if (serial != NULL) {
         serial->running = 0;
     }
-    
     destroy(serial);
 
     return 0;
